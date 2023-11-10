@@ -14,8 +14,42 @@ class ProductController extends BaseController {
             'nama_product' => 'Semangka',
             'description' => 'Buah - buahan',
         ];
-
         $this->product->insertProductORM($data);
+    }
+
+    public function insertProductApi(){
+        $resquestData = $this->request->getJSON();
+        $validation = $this->validate([
+            'nama_product' => 'required',
+            'description' => 'required',
+        ]);
+        if(!$validation){
+            $this->response->setStatusCode(400);
+            return $this->response->setJSON([
+                'code' => 400,
+                'status' => 'BAD REQUEST',
+                'data' => 'semua harus terisi'
+            ]);
+        }
+        $data = [
+            'nama_product' => $resquestData->nama_product,
+            'description' => $resquestData->description,
+        ];
+        $insert = $this->product->insertProductORM($data);
+        if ($insert) {
+            return $this->respond([
+                'code' => 200,
+                'status' => 'OK',
+                'data' => $data
+            ]);
+        } else {
+            $this->response->setStatusCode(500);
+            return $this->response->setJSON([
+                'code' => 500,
+                'status' => 'INTERNAL SERVER ERROR',
+                'data' => null
+            ]);
+        }
     }
 
     public function readProduct(){
